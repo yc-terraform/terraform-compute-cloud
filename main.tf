@@ -6,12 +6,11 @@ locals {
   folder_id = var.folder_id == null ? data.yandex_client_config.client.folder_id : var.folder_id
 
 }
-# Add the image_family variable to the data source for the image
+
 data "yandex_compute_image" "this" {
   family = var.image_family
 }
 
-# Add the is_nat variable to the network_interface block
 resource "yandex_compute_instance" "this" {
   name               = var.name
   platform_id        = var.platform_id
