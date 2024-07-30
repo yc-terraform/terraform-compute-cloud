@@ -67,6 +67,3 @@
 | fqdn                         | The fully qualified DNS name of this instance.      |
 | network_interface.0.ip_address | The internal IP address of the instance.         |
 | network_interface.0.nat_ip_address | The external IP address of the instance.        |
-| status                       | The status of this instance.                        |
-| created_at                   | Creation timestamp of the instance.                 |
-| local_disk.device_name       | The name of the local disk device.                  |

@@ -7,7 +7,7 @@ terraform {
       version = "> 0.8"
     }
   }
-} 
+}
 provider "yandex" {
   zone = "ru-central1"
 }
