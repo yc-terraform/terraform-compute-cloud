@@ -29,6 +29,31 @@ resource "yandex_compute_disk" "this" {
     }
   }
 }
+resource "yandex_vpc_address" "static_ip" {
+  count = var.static_ip != null ? 1 : 0
+  name                      = var.static_ip.name
+  description               = var.static_ip.description
+  folder_id                 = var.static_ip.folder_id
+  labels                    = var.static_ip.labels
+  deletion_protection       = var.static_ip.deletion_protection
+
+  external_ipv4_address {
+    zone_id                   = var.static_ip.external_ipv4_address.zone_id
+    ddos_protection_provider  = var.static_ip.external_ipv4_address.ddos_protection_provider
+    outgoing_smtp_capability  = var.static_ip.external_ipv4_address.outgoing_smtp_capability
+  }
+
+  dynamic "dns_record" {
+    for_each = var.static_ip.dns_record != null ? [var.static_ip.dns_record] : []
+    content {
+      fqdn        = dns_record.value.fqdn
+      dns_zone_id = dns_record.value.dns_zone_id
+      ttl         = lookup(dns_record.value, "ttl", null)
+      ptr         = lookup(dns_record.value, "ptr", false)
+    }
+  }
+}
+
 
 resource "yandex_compute_instance" "this" {
   name               = var.name
@@ -39,7 +64,8 @@ resource "yandex_compute_instance" "this" {
   folder_id          = local.folder_id
   service_account_id = var.service_account_id
   labels             = var.labels
-  metadata           = var.metadata
+  metadata = merge(var.enable_oslogin_or_ssh_keys, var.custom_metadata, var.serial_port_enable ? {"serial-port-enable" = "1"} : {})
+
   allow_stopping_for_update = var.allow_stopping_for_update
   network_acceleration_type = var.network_acceleration_type
   gpu_cluster_id     = var.gpu_cluster_id
@@ -72,10 +98,11 @@ resource "yandex_compute_instance" "this" {
     content {
       subnet_id          = network_interface.value.subnet_id
       index              = lookup(network_interface.value, "index", null)
-      ipv4               = lookup(network_interface.value, "ipv4", true)
+      ipv4               = lookup(network_interface.value, "ipv4", false)
       ip_address         = lookup(network_interface.value, "ip_address", null)
       nat                = lookup(network_interface.value, "nat", false)
-      nat_ip_address     = lookup(network_interface.value, "nat_ip_address", null)
+      nat_ip_address     = lookup(network_interface.value, "ipv4", false) && var.static_ip != null ? yandex_vpc_address.static_ip[0].id : null
+
       security_group_ids = lookup(network_interface.value, "security_group_ids", null)
 
       dynamic "dns_record" {

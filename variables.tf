@@ -89,7 +89,28 @@ variable "network_interfaces" {
     }
   ]
 }
-
+variable "static_ip" {
+  description = "Configuration for static IP address"
+  type = object({
+    name                      = optional(string)
+    description               = optional(string)
+    folder_id                 = optional(string)
+    labels                    = optional(map(string))
+    deletion_protection       = optional(bool)
+    external_ipv4_address     = optional(object({
+      zone_id                   = string
+      ddos_protection_provider  = optional(string)
+      outgoing_smtp_capability  = optional(string)
+    }))
+    dns_record                = optional(object({
+      fqdn        = string
+      dns_zone_id = string
+      ttl         = optional(number)
+      ptr         = optional(bool)
+    }))
+  })
+  default = null
+}
 
 variable "block_size" {
   description = "Block size of the disk, specified in bytes"
@@ -214,13 +235,32 @@ variable "labels" {
   default     = {}
 }
 
-variable "metadata" {
-  description = "Metadata key/value pairs to make available from within the instance."
-  type        = map(string)
-  default     = {}
-}
-
-variable "metadata_options" {
+variable "enable_oslogin_or_ssh_keys" {
+   description = "Enabling OS Login or adding ssh-keys to metadata of node-groups."
+   type        = map(any)
+   default = {
+     enable-oslogin = "false"
+     ssh-keys       = null
+   }
+   validation {
+     condition     = contains(["true", "false"], var.enable_oslogin_or_ssh_keys.enable-oslogin) && ((var.enable_oslogin_or_ssh_keys.enable-oslogin == "true" && var.enable_oslogin_or_ssh_keys.ssh-keys == null) || (var.enable_oslogin_or_ssh_keys.enable-oslogin == "false"))
+     error_message = "Either OS Login or ssh-keys should be enabled or none of them."
+   }
+ }
+ variable "custom_metadata" {
+   description = <<-EOF
+     Adding custom metadata to node-groups.
+     Example:
+     ```
+     custom_metadata = {
+       foo = "bar"
+     }
+     ```
+   EOF
+   type        = map(any)
+   default     = {}
+ }
+ variable "metadata_options" {
   description = "Metadata options for the instance"
   type = object({
     http_endpoint = string
@@ -231,7 +271,11 @@ variable "metadata_options" {
     http_tokens   = "optional"
   }
 }
-
+variable "serial_port_enable" {
+  description = "Enable serial port"
+  type        = bool
+  default     = false
+}
 variable "allow_stopping_for_update" {
   description = "If true, allows Terraform to stop the instance in order to update its properties. If you try to update a property that requires stopping the instance without setting this field, the update will fail."
   type        = bool
