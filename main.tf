@@ -10,49 +10,6 @@ data "yandex_compute_image" "image" {
   family = var.image_family
   count = var.image_family != null ? 1 : 0
 }
-resource "yandex_compute_disk" "this" {
-  name        = var.name
-  description = var.description
-  folder_id   = var.folder_id
-  labels      = var.labels
-  zone        = var.zone
-  size        = var.size
-  block_size  = var.block_size
-  type        = var.type
-  image_id    = var.image_family != null ? data.yandex_compute_image.image[0].id : var.image_id
-  snapshot_id = var.snapshot_id
-
-  dynamic "disk_placement_policy" {
-    for_each = var.disk_placement_policy != null ? [var.disk_placement_policy] : []
-    content {
-      disk_placement_group_id = disk_placement_policy.value.disk_placement_group_id
-    }
-  }
-}
-resource "yandex_vpc_address" "static_ip" {
-  count = var.static_ip != null ? 1 : 0
-  name                      = var.static_ip.name
-  description               = var.static_ip.description
-  folder_id                 = var.static_ip.folder_id
-  labels                    = var.static_ip.labels
-  deletion_protection       = var.static_ip.deletion_protection
-
-  external_ipv4_address {
-    zone_id                   = var.static_ip.external_ipv4_address.zone_id
-    ddos_protection_provider  = var.static_ip.external_ipv4_address.ddos_protection_provider
-    outgoing_smtp_capability  = var.static_ip.external_ipv4_address.outgoing_smtp_capability
-  }
-
-  dynamic "dns_record" {
-    for_each = var.static_ip.dns_record != null ? [var.static_ip.dns_record] : []
-    content {
-      fqdn        = dns_record.value.fqdn
-      dns_zone_id = dns_record.value.dns_zone_id
-      ttl         = lookup(dns_record.value, "ttl", null)
-      ptr         = lookup(dns_record.value, "ptr", false)
-    }
-  }
-}
 
 
 resource "yandex_compute_instance" "this" {
@@ -62,7 +19,8 @@ resource "yandex_compute_instance" "this" {
   description        = var.description
   hostname           = var.hostname
   folder_id          = local.folder_id
-  service_account_id = var.service_account_id
+  service_account_id = var.service_account_id != null ? var.service_account_id : (var.monitoring ? yandex_iam_service_account.sa_instance[0].id : null)
+
   labels             = var.labels
   metadata = merge(var.enable_oslogin_or_ssh_keys, var.custom_metadata, var.serial_port_enable ? {"serial-port-enable" = "1"} : {})
 
@@ -101,7 +59,7 @@ resource "yandex_compute_instance" "this" {
       ipv4               = lookup(network_interface.value, "ipv4", false)
       ip_address         = lookup(network_interface.value, "ip_address", null)
       nat                = lookup(network_interface.value, "nat", false)
-      nat_ip_address     = lookup(network_interface.value, "ipv4", false) && var.static_ip != null ? yandex_vpc_address.static_ip[0].id : null
+      nat_ip_address     = lookup(network_interface.value, "nat", false) && var.static_ip != null ? yandex_vpc_address.static_ip[0].external_ipv4_address[0].address : null
 
       security_group_ids = lookup(network_interface.value, "security_group_ids", null)
 

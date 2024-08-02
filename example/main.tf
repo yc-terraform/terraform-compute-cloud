@@ -45,4 +45,5 @@ module "dev" {
       zone_id = var.yc_zone
     }
   }
+  monitoring = true
 }

@@ -307,129 +307,12 @@ variable "maintenance_grace_period" {
 }
 
 
-variable "network_interface_index" {
-  description = "Index of network interface, will be calculated automatically for instance create or update operations if not specified. Required for attach/detach operations."
-  type        = number
-  default     = 0
-}
-
-variable "network_interface_ipv4" {
-  description = "Allocate an IPv4 address for the interface. The default value is true."
-  type        = bool
-  default     = true
-}
-
-variable "network_interface_ip_address" {
-  description = "The private IP address to assign to the instance. If empty, the address will be automatically assigned from the specified subnet."
-  type        = string
-  default     = ""
-}
-
-variable "network_interface_ipv6" {
-  description = "If true, allocate an IPv6 address for the interface. The address will be automatically assigned from the specified subnet."
-  type        = bool
-  default     = false
-}
-
-variable "network_interface_ipv6_address" {
-  description = "The private IPv6 address to assign to the instance."
-  type        = string
-  default     = ""
-}
-
-variable "network_interface_nat" {
-  description = "Provide a public address, for instance, to access the internet over NAT."
-  type        = bool
-  default     = false
-}
-
-variable "network_interface_nat_ip_address" {
-  description = "Provide a public address, for instance, to access the internet over NAT. Address should be already reserved in web UI."
-  type        = string
-  default     = ""
-}
-
-variable "network_interface_security_group_ids" {
-  description = "Security group ids for network interface."
-  type        = list(string)
-  default     = []
-}
-
-variable "network_interface_dns_record_fqdn" {
-  description = "DNS record FQDN (must have a dot at the end)."
-  type        = string
-  default     = ""
-}
-
-variable "network_interface_dns_record_dns_zone_id" {
-  description = "DNS zone ID (if not set, private zone used)."
-  type        = string
-  default     = ""
-}
-
-variable "network_interface_dns_record_ttl" {
-  description = "DNS record TTL in seconds."
-  type        = number
-  default     = 300
-}
-
-variable "network_interface_dns_record_ptr" {
-  description = "When set to true, also create a PTR DNS record."
-  type        = bool
-  default     = false
-}
-
-variable "network_interface_ipv6_dns_record_fqdn" {
-  description = "DNS record FQDN (must have a dot at the end)."
-  type        = string
-  default     = ""
-}
-
-variable "network_interface_ipv6_dns_record_dns_zone_id" {
-  description = "DNS zone ID (if not set, private zone used)."
-  type        = string
-  default     = ""
-}
-
-variable "network_interface_ipv6_dns_record_ttl" {
-  description = "DNS record TTL in seconds."
-  type        = number
-  default     = 300
-}
-
-variable "network_interface_ipv6_dns_record_ptr" {
-  description = "When set to true, also create a PTR DNS record."
-  type        = bool
-  default     = false
-}
 variable "is_nat" {
   description = "Whether to enable NAT for the instance."
   type        = bool
   default     = false
 }
-variable "network_interface_nat_dns_record_fqdn" {
-  description = "DNS record FQDN (must have a dot at the end)."
-  type        = string
-  default     = ""
-}
 
-variable "network_interface_nat_dns_record_dns_zone_id" {
-  description = "DNS zone ID (if not set, private zone used)."
-  type        = string
-  default     = ""
-}
-
-variable "network_interface_nat_dns_record_ttl" {
-  description = "DNS record TTL in seconds."
-  type        = number
-  default     = 300
-}
-
-variable "network_interface_nat_dns_record_ptr" {
-  description = "When set to true, also create a PTR DNS record."
-  type        = bool
-  default     = false
-}
 
 variable "secondary_disks" {
   description = "A set of disks to attach to the instance."
@@ -483,7 +366,13 @@ variable "filesystems" {
 }
 
 variable "service_account_id" {
-  description = "ID of the service account authorized for this instance."
+  description = "Optional service account ID"
   type        = string
-  default     = ""
+  default     = null
+}
+
+variable "monitoring" {
+  description = "Flag to create a new service account if service_account_id is not provided"
+  type        = bool
+  default     = false
 }
