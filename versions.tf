@@ -6,5 +6,9 @@ terraform {
       source  = "yandex-cloud/yandex"
       version = "> 0.8"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "> 3.3"
+    }
   }
 }

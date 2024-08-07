@@ -14,3 +14,5 @@ provider "yandex" {
 
 
 provider "local" {}
+
+provider "random" {}

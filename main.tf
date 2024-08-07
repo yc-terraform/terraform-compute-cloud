@@ -11,18 +11,22 @@ data "yandex_compute_image" "image" {
   count = var.image_family != null ? 1 : 0
 }
 
-
 resource "yandex_compute_instance" "this" {
-  name               = var.name
+  name               = "${var.name}-${random_string.unique_id.result}"
   platform_id        = var.platform_id
   zone               = var.zone
   description        = var.description
   hostname           = var.hostname
   folder_id          = local.folder_id
-  service_account_id = var.service_account_id != null ? var.service_account_id : (var.monitoring ? yandex_iam_service_account.sa_instance[0].id : null)
+  service_account_id = var.service_account_id != null ? var.service_account_id : (var.monitoring || var.backup ? yandex_iam_service_account.sa_instance[0].id : null)
 
   labels             = var.labels
-  metadata = merge(var.enable_oslogin_or_ssh_keys, var.custom_metadata, var.serial_port_enable ? {"serial-port-enable" = "1"} : {})
+  metadata = merge(
+    var.enable_oslogin_or_ssh_keys,
+    var.custom_metadata,
+    var.serial_port_enable ? {"serial-port-enable" = "1"} : {},
+    var.monitoring ? local.monitoring_metadata : {}
+  )
 
   allow_stopping_for_update = var.allow_stopping_for_update
   network_acceleration_type = var.network_acceleration_type

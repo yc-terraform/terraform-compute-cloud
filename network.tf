@@ -2,7 +2,7 @@
 
 resource "yandex_vpc_address" "static_ip" {
   count = var.static_ip != null ? 1 : 0
-  name                      = var.static_ip.name
+  name               = "${var.name}-${random_string.unique_id.result}"
   description               = var.static_ip.description
   folder_id                 = local.folder_id
   labels                    = var.static_ip.labels

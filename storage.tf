@@ -1,6 +1,6 @@
 
 resource "yandex_compute_disk" "this" {
-  name        = var.name
+  name               = "${var.name}-${random_string.unique_id.result}"
   description = var.description
   folder_id   = local.folder_id
   labels      = var.labels
@@ -17,4 +17,16 @@ resource "yandex_compute_disk" "this" {
       disk_placement_group_id = disk_placement_policy.value.disk_placement_group_id
     }
   }
+}
+
+resource "yandex_compute_filesystem" "this" {
+  count       = var.create_filesystem ? 1 : 0
+  name        = "${var.filesystem_name}-${random_string.unique_id.result}"
+  description = var.filesystem_description
+  folder_id   = local.folder_id
+  labels      = var.filesystem_labels
+  zone        = var.filesystem_zone != null ? var.filesystem_zone : var.zone
+  size        = var.filesystem_size
+  block_size  = var.filesystem_block_size
+  type        = var.filesystem_type
 }

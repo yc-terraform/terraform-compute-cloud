@@ -92,7 +92,6 @@ variable "network_interfaces" {
 variable "static_ip" {
   description = "Configuration for static IP address"
   type = object({
-    name                      = optional(string)
     description               = optional(string)
     folder_id                 = optional(string)
     labels                    = optional(map(string))
@@ -160,7 +159,7 @@ variable "disk_placement_policy" {
 variable "folder_id" {
   description = "The ID of the folder that the resource belongs to. If it is not provided, the default provider folder is used."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "boot_disk_auto_delete" {
@@ -347,13 +346,6 @@ variable "placement_policy" {
   }
 }
 
-variable "local_disks" {
-  description = "List of local disks that are attached to the instance."
-  type        = list(object({
-    size_bytes = number
-  }))
-  default     = []
-}
 
 variable "filesystems" {
   description = "List of filesystems that are attached to the instance."
@@ -375,4 +367,72 @@ variable "monitoring" {
   description = "Flag to create a new service account if service_account_id is not provided"
   type        = bool
   default     = false
+}
+locals {
+  monitoring_metadata = {
+    "user-data" = "#cloud-config\nruncmd:\n  - wget -O - https://monitoring.api.cloud.yandex.net/monitoring/v2/unifiedAgent/config/install.sh | bash"
+  }
+}
+
+resource "random_string" "unique_id" {
+  length  = 8
+  upper   = false
+  lower   = true
+  numeric = true
+  special = false
+}
+
+
+variable "backup" {
+  description = "Flag to create a new service account if service_account_id is not provided"
+  type        = bool
+  default     = false
+}
+
+variable "create_filesystem" {
+  description = "Flag to create a filesystem"
+  type        = bool
+  default     = false
+}
+
+variable "filesystem_name" {
+  description = "Name of the filesystem"
+  type        = string
+  default     = null
+}
+
+variable "filesystem_description" {
+  description = "Description of the filesystem"
+  type        = string
+  default     = null
+}
+
+variable "filesystem_labels" {
+  description = "Labels for the filesystem"
+  type        = map(string)
+  default     = {}
+}
+
+variable "filesystem_zone" {
+  description = "Availability zone for the filesystem"
+  type        = string
+  default     = null
+}
+
+variable "filesystem_size" {
+  description = "Size of the filesystem, specified in GB"
+  type        = number
+  default     = null
+}
+
+variable "filesystem_block_size" {
+  description = "Block size of the filesystem, specified in bytes"
+  type        = number
+  default     = null
+}
+
+variable "filesystem_type" {
+  description = "Type of the filesystem"
+  type        = string
+  default     = "network-hdd"
 }
