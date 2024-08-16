@@ -25,7 +25,14 @@ resource "yandex_compute_instance" "this" {
     var.enable_oslogin_or_ssh_keys,
     var.custom_metadata,
     var.serial_port_enable ? {"serial-port-enable" = "1"} : {},
-    var.monitoring ? local.monitoring_metadata : {}
+    var.monitoring || var.backup ? {
+     "user-data" = format("#cloud-config\nruncmd:\n%s",
+       join("\n", compact([
+         var.backup ? "  - curl 'https://storage.yandexcloud.net/backup-distributions/agent_reinit.sh' | sudo bash" : null,
+         var.monitoring ? "  - wget -O - https://monitoring.api.cloud.yandex.net/monitoring/v2/unifiedAgent/config/install.sh | bash" : null
+       ]))
+      )
+    } : {}
   )
 
   allow_stopping_for_update = var.allow_stopping_for_update

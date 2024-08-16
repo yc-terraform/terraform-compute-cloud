@@ -53,7 +53,7 @@ variable "hostname" {
 variable "size" {
   description = "The size of the disk in GB."
   type        = number
-  default     = 100
+  default     = 30
   validation {
     condition     = var.size >= 4 && var.size <= 8192
     error_message = "Disk size must be in range [4, 8192] GB."
@@ -367,11 +367,6 @@ variable "monitoring" {
   description = "Flag to create a new service account if service_account_id is not provided"
   type        = bool
   default     = false
-}
-locals {
-  monitoring_metadata = {
-    "user-data" = "#cloud-config\nruncmd:\n  - wget -O - https://monitoring.api.cloud.yandex.net/monitoring/v2/unifiedAgent/config/install.sh | bash"
-  }
 }
 
 resource "random_string" "unique_id" {
