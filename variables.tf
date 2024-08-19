@@ -349,12 +349,12 @@ variable "placement_policy" {
 
 variable "filesystems" {
   description = "List of filesystems that are attached to the instance."
-  type        = list(object({
-    filesystem_id = string
-    device_name   = string
-    mode          = string
+  type = list(object({
+    filesystem_id = optional(string, null)
+    device_name   = optional(string, null)
+    mode          = optional(string, "READ_WRITE")
   }))
-  default     = []
+  default = []
 }
 
 variable "service_account_id" {

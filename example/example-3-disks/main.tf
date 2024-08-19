@@ -41,6 +41,17 @@ module "dev" {
     mode        = "READ_WRITE"
     }
   ]
+  create_filesystem = true
+  filesystem_name = "dev-filesystem"
+  filesystem_description = "Filesystem for dev"
+  filesystem_size = 50
+  filesystem_type = "network-ssd"
+  filesystems = [
+    {
+      filesystem_id = null 
+      mode = "READ_WRITE"
+    }
+  ]
 }
 
 

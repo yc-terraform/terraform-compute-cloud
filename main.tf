@@ -115,13 +115,13 @@ resource "yandex_compute_instance" "this" {
   }
 
 
-
   dynamic "filesystem" {
-    for_each = var.filesystems != null ? [for f in var.filesystems : f] : []
+    for_each = var.filesystems
     content {
-      filesystem_id = filesystem.value.filesystem_id
+      filesystem_id = filesystem.value.filesystem_id != null ? filesystem.value.filesystem_id : (length(yandex_compute_filesystem.this) > 0 ? yandex_compute_filesystem.this[0].id : null)
       device_name   = filesystem.value.device_name
       mode          = filesystem.value.mode
     }
   }
+  
 }

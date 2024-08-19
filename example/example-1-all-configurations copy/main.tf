@@ -1,5 +1,5 @@
 module "dev" {
-  source        = ""../../""
+  source        = "../../"
   image_family      = "ubuntu-2404-lts-oslogin"
   zone          = var.yc_zone
   name          = "dev"
