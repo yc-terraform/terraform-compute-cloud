@@ -57,7 +57,7 @@ module "compute_instance" {
     }
   ]
 }
-
+```
  ## How to Configure Terraform for Yandex.Cloud
 
  1. Install [YC CLI](https://cloud.yandex.com/docs/cli/quickstart)
