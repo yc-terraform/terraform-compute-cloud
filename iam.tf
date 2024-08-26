@@ -1,5 +1,5 @@
 locals {
-  service_account_name = "sa-${var.name}-${random_string.unique_id.result}"
+  service_account_name = var.name != null ? var.name : "sa-${random_string.unique_id.result}"
   create_sa = var.service_account_id == null && (var.monitoring || var.backup)
 }
 

@@ -11,8 +11,10 @@ data "yandex_compute_image" "image" {
   count = var.image_family != null ? 1 : 0
 }
 
+
 resource "yandex_compute_instance" "this" {
-  name               = "${var.name}-${random_string.unique_id.result}"
+
+  name = var.name
   platform_id        = var.platform_id
   zone               = var.zone
   description        = var.description
@@ -20,7 +22,11 @@ resource "yandex_compute_instance" "this" {
   folder_id          = local.folder_id
   service_account_id = var.service_account_id != null ? var.service_account_id : (var.monitoring || var.backup ? yandex_iam_service_account.sa_instance[0].id : null)
 
-  labels             = var.labels
+  labels = merge(
+    var.labels,
+    var.labels["scope"] == null ? { "scope" = random_string.unique_id.result } : {}
+  )
+
   metadata = merge(
     var.enable_oslogin_or_ssh_keys,
     var.custom_metadata,
@@ -124,4 +130,13 @@ resource "yandex_compute_instance" "this" {
     }
   }
   
+}
+data "yandex_backup_policy" "this_backup_policy" {
+  name  = var.backup_frequency
+}
+
+resource "yandex_backup_policy_bindings" "this_backup_binding" {
+  count       = var.backup ? 1 : 0
+  instance_id = yandex_compute_instance.this.id
+  policy_id   = data.yandex_backup_policy.this_backup_policy.id
 }

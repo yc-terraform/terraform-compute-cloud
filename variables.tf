@@ -402,11 +402,6 @@ variable "filesystem_description" {
   default     = null
 }
 
-variable "filesystem_labels" {
-  description = "Labels for the filesystem"
-  type        = map(string)
-  default     = {}
-}
 
 variable "filesystem_zone" {
   description = "Availability zone for the filesystem"
@@ -430,4 +425,10 @@ variable "filesystem_type" {
   description = "Type of the filesystem"
   type        = string
   default     = "network-hdd"
+}
+
+variable "backup_frequency" {
+  description = "Timing of backups: Default daily,  Default weekly, Default monthly"
+  type        = string
+  default     = "Default daily"
 }

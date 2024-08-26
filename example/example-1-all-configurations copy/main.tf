@@ -18,10 +18,6 @@ module "dev" {
   create_filesystem       = true
   filesystem_name         = "my-filesystem"
   filesystem_description  = "Filesystem for dev instance"
-  filesystem_labels       = {
-    environment = "development"
-    scope       = "dev"
-  }
   filesystem_zone         = var.yc_zone
   filesystem_size         = 100
   filesystem_block_size   = 4096
