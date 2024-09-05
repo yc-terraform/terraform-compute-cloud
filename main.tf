@@ -28,16 +28,22 @@ resource "yandex_compute_instance" "this" {
   )
 
   metadata = merge(
-    var.enable_oslogin_or_ssh_keys,
     var.custom_metadata,
     var.serial_port_enable ? {"serial-port-enable" = "1"} : {},
     var.monitoring || var.backup ? {
-     "user-data" = format("#cloud-config\nruncmd:\n%s",
-       join("\n", compact([
-         var.backup ? "  - curl 'https://storage.yandexcloud.net/backup-distributions/agent_reinit.sh' | sudo bash" : null,
-         var.monitoring ? "  - wget -O - https://monitoring.api.cloud.yandex.net/monitoring/v2/unifiedAgent/config/install.sh | bash" : null
-       ]))
+      "user-data" = format("#cloud-config\n%s\nruncmd:\n%s",
+        fileexists(var.enable_oslogin_or_ssh_keys.ssh_key) ? format("users:\n  - name: %s\n    sudo: ALL=(ALL) NOPASSWD:ALL\n    shell: /bin/bash\n    ssh_authorized_keys:\n      - %s",
+          var.enable_oslogin_or_ssh_keys.ssh_user,
+          file(var.enable_oslogin_or_ssh_keys.ssh_key)
+        ) : "",
+        join("\n", compact([
+          var.backup ? "  - curl 'https://storage.yandexcloud.net/backup-distributions/agent_installer.sh' | sudo bash" : null,
+          var.monitoring ? "  - wget -O - https://monitoring.api.cloud.yandex.net/monitoring/v2/unifiedAgent/config/install.sh | bash" : null
+        ]))
       )
+    } : {},
+    var.enable_oslogin_or_ssh_keys.enable-oslogin == "true" ? {
+      "enable-oslogin" = var.enable_oslogin_or_ssh_keys.enable-oslogin
     } : {}
   )
 
@@ -136,7 +142,7 @@ data "yandex_backup_policy" "this_backup_policy" {
 }
 
 resource "yandex_backup_policy_bindings" "this_backup_binding" {
-  count       = var.backup ? 1 : 0
+  #count       = var.backup ? 1 : 0
   instance_id = yandex_compute_instance.this.id
   policy_id   = data.yandex_backup_policy.this_backup_policy.id
 }

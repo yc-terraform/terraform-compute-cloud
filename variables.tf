@@ -239,13 +239,15 @@ variable "enable_oslogin_or_ssh_keys" {
    type        = map(any)
    default = {
      enable-oslogin = "false"
-     ssh-keys       = null
+     ssh_user       = null
+     ssh_key        = null
    }
    validation {
-     condition     = contains(["true", "false"], var.enable_oslogin_or_ssh_keys.enable-oslogin) && ((var.enable_oslogin_or_ssh_keys.enable-oslogin == "true" && var.enable_oslogin_or_ssh_keys.ssh-keys == null) || (var.enable_oslogin_or_ssh_keys.enable-oslogin == "false"))
-     error_message = "Either OS Login or ssh-keys should be enabled or none of them."
+     condition = contains(["true", "false"], var.enable_oslogin_or_ssh_keys.enable-oslogin) &&  ((var.enable_oslogin_or_ssh_keys.enable-oslogin == "true" && var.enable_oslogin_or_ssh_keys.ssh_user == null && var.enable_oslogin_or_ssh_keys.ssh_key == null) ||
+                 (var.enable_oslogin_or_ssh_keys.enable-oslogin == "false" && var.enable_oslogin_or_ssh_keys.ssh_user != null && var.enable_oslogin_or_ssh_keys.ssh_key != null))
+     error_message = "Either OS Login should be enabled or SSH keys (ssh_user and ssh_key) should be provided."
    }
- }
+}
  variable "custom_metadata" {
    description = <<-EOF
      Adding custom metadata to node-groups.

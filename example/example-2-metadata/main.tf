@@ -1,6 +1,6 @@
 module "dev" {
   source        = "../../"
-  image_family      = "ubuntu-2004-lts"
+  image_family      = "ubuntu-2204-lts"
   zone          = var.yc_zone
   name          = "dev"
   hostname      = "dev"
@@ -16,9 +16,11 @@ module "dev" {
   monitoring  = true
   backup      = true
   enable_oslogin_or_ssh_keys = {
-    enable-oslogin = "false"
-    ssh-keys = "devops:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3U4K+k01JcsTvZNa7n1MlJ0TkEVY+7+gfsy+GczGYyXRVpekSydQZB3S/spsb6MW9da94uC2iUwtN/UHYVgiCOU51d7e/1LS4riBsz4NKT4kkWBZxXhmfFAxS4cz1WCPfklF5dePPjyE997jH2tCFStiWlEn7gML1R96/QPLmqRebjdRqPDgTZE4YuIOTsfWiZtoQTPaVg64s/wjU0K0UPFulPYlIvUzt8ZaZ+/mfvJO32tNkqLzN/9uMtFZI+r1dEV/cQyx7C+5S9ysiuiYzXXeoLPGvq4PF2MtcUhDq1LgUI7GP9LYMFuXLamqE3zmdlk1acJro1ViBWRtnADej devops@devops"
+    enable-oslogin = "false"  
+    ssh_user        = "devops"
+    ssh_key       = "~/.ssh/id_rsa.pub"
   }
+
   metadata_options = {
     http_endpoint = "enabled"
     http_tokens   = "required"
