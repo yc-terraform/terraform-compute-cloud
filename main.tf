@@ -21,11 +21,7 @@ resource "yandex_compute_instance" "this" {
   hostname           = var.hostname
   folder_id          = local.folder_id
   service_account_id = var.service_account_id != null ? var.service_account_id : (var.monitoring || var.backup ? yandex_iam_service_account.sa_instance[0].id : null)
-
-  labels = merge(
-    var.labels,
-    var.labels["scope"] == null ? { "scope" = random_string.unique_id.result } : {}
-  )
+  labels             = var.labels
 
   metadata = merge(
     var.custom_metadata,
@@ -64,15 +60,6 @@ resource "yandex_compute_instance" "this" {
     mode        = var.boot_disk_mode
     disk_id     = yandex_compute_disk.this != null ? yandex_compute_disk.this.id : var.boot_disk_disk_id
 
-    initialize_params {
-      name        = yandex_compute_disk.this != null ? yandex_compute_disk.this.name : var.boot_disk_name
-      description = yandex_compute_disk.this != null ? yandex_compute_disk.this.description : var.boot_disk_description
-      size        = yandex_compute_disk.this != null ? yandex_compute_disk.this.size : var.boot_disk_size
-      block_size  = yandex_compute_disk.this != null ? yandex_compute_disk.this.block_size : var.boot_disk_block_size
-      type        = yandex_compute_disk.this != null ? yandex_compute_disk.this.type : var.boot_disk_type
-      image_id    = yandex_compute_disk.this != null ? yandex_compute_disk.this.image_id : var.boot_disk_image_id
-      snapshot_id = yandex_compute_disk.this != null ? yandex_compute_disk.this.snapshot_id : var.boot_disk_snapshot_id
-    }
   }
   dynamic "network_interface" {
     for_each = var.network_interfaces
@@ -137,6 +124,7 @@ resource "yandex_compute_instance" "this" {
   }
   
 }
+
 data "yandex_backup_policy" "this_backup_policy" {
   name  = var.backup_frequency
 }

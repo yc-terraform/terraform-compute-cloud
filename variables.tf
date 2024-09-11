@@ -6,7 +6,7 @@ variable "name" {
 variable "platform_id" {
   description = "The type of virtual machine to create. The default is 'standard-v1'."
   type        = string
-  default     = "standard-v1"
+  default     = "standard-v3"
 }
 
 variable "zone" {

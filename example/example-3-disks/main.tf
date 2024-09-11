@@ -64,3 +64,9 @@ resource "yandex_compute_disk" "dev" {
   block_size  = "4096"
   type        = "network-hdd"
 }
+
+
+/// при созздании secondary disk добавить еще map с именем дисков n+1 со всеми характеристикими. если в парамтерах seconday disks указал id, то его не надо сздавать а зацепить существуется через for each 
+/// filesystem [check "name" {
+   /// bla bla bla filesystems
+//}]

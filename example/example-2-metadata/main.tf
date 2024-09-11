@@ -14,7 +14,7 @@ module "dev" {
   serial_port_enable = true
   allow_stopping_for_update = true
   monitoring  = true
-  backup      = true
+  backup      = false
   enable_oslogin_or_ssh_keys = {
     enable-oslogin = "false"  
     ssh_user        = "devops"

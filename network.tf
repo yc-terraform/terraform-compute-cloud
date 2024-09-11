@@ -6,10 +6,7 @@ resource "yandex_vpc_address" "static_ip" {
   description               = var.static_ip.description
   folder_id                 = local.folder_id
   deletion_protection       = var.static_ip.deletion_protection
-  labels = merge(
-    var.labels,
-    var.labels["scope"] == null ? { "scope" = random_string.unique_id.result } : {}
-  )
+  labels             = var.labels
   external_ipv4_address {
     zone_id                   = var.static_ip.external_ipv4_address.zone_id
     ddos_protection_provider  = var.static_ip.external_ipv4_address.ddos_protection_provider
