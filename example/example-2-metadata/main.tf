@@ -13,8 +13,8 @@ module "dev" {
   core_fraction = 100
   serial_port_enable = true
   allow_stopping_for_update = true
-  monitoring  = true
-  backup      = false
+  monitoring  = false
+  backup      = true
   enable_oslogin_or_ssh_keys = {
     enable-oslogin = "false"  
     ssh_user        = "devops"

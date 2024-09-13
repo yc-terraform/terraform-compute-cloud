@@ -27,7 +27,7 @@ resource "yandex_compute_instance" "this" {
     var.custom_metadata,
     var.serial_port_enable ? {"serial-port-enable" = "1"} : {},
     var.monitoring || var.backup ? {
-      "user-data" = format("#cloud-config\n%s\nruncmd:\n%s",
+      "user-data" = format("#cloud-config\npackages:\n  - curl\n  - perl\n  - jq\n%s\nruncmd:\n%s",
         fileexists(var.enable_oslogin_or_ssh_keys.ssh_key) ? format("users:\n  - name: %s\n    sudo: ALL=(ALL) NOPASSWD:ALL\n    shell: /bin/bash\n    ssh_authorized_keys:\n      - %s",
           var.enable_oslogin_or_ssh_keys.ssh_user,
           file(var.enable_oslogin_or_ssh_keys.ssh_key)
@@ -130,7 +130,7 @@ data "yandex_backup_policy" "this_backup_policy" {
 }
 
 resource "yandex_backup_policy_bindings" "this_backup_binding" {
-  #count       = var.backup ? 1 : 0
+  count       = var.backup ? 1 : 0
   instance_id = yandex_compute_instance.this.id
   policy_id   = data.yandex_backup_policy.this_backup_policy.id
 }
